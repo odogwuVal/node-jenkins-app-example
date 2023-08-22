@@ -79,7 +79,7 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github.run_number) }}
         run: |
-          echo ::set-env name=GITHUB_RUN_NUMBER_WITH_OFFSET::$(($GITHUB_CONTEXT+200))
+          echo ::set-env name=GITHUB_RUN_NUMBER_WITH_OFFSET::$(($GITHUB_CONTEXT - 200))
           - run: echo $GITHUB_RUN_NUMBER_WITH_OFFSET
       - name: Test
         run: echo "I am just checking"
