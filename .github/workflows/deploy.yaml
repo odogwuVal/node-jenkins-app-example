@@ -80,6 +80,7 @@ jobs:
           GITHUB_CONTEXT: ${{ github.run_number }}
         run: |
           echo GITHUB_RUN_NUMBER_WITH_OFFSET=$(($GITHUB_CONTEXT-1)) >> $GITHUB_ENV
+          echo env.GITHUB_RUN_NUMBER_WITH_OFFSET
 
       - name: 'Perform Operation with ID ${{ env.GITHUB_RUN_NUMBER_WITH_OFFSET }}'
         run: echo "Success!"
