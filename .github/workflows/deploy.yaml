@@ -42,11 +42,15 @@ jobs:
       uses: docker/build-push-action@v4
       env: 
         GITHUB_CONTEXT: ${{ toJson(github.run_number) }}
-      with:
-        context: .
-        file: ./Dockerfile
-        push: true
-        tags: ${{ secrets.DOCKER_USERNAME}}/seamlesshr:24
+      run: |
+        sudo docker build -t seamlesshr .
+        docker tag seamlesshr ${{ secrets.DOCKER_USERNAME}}/seamlesshr:$GITHUB_CONTEXT 
+        docker push ${{ secrets.DOCKER_USERNAME}}/seamlesshr:$GITHUB_CONTEXT 
+      # with:
+      #   context: .
+      #   file: ./Dockerfile
+      #   push: true
+      #   tags: ${{ secrets.DOCKER_USERNAME}}/seamlesshr:24
 
   deploy_to_prod:
     runs-on: ubuntu-latest
