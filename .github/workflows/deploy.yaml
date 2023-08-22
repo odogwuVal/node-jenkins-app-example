@@ -44,7 +44,7 @@ jobs:
         GITHUB_CONTEXT: ${{ toJson(github.run_number) }}
       run: |
         sudo docker build -t seamlesshr .
-        docker tag seamlesshr ${{ secrets.DOCKER_USERNAME}}/seamlesshr:$GITHUB_CONTEXT 
+        docker image tag seamlesshr ${{ secrets.DOCKER_USERNAME}}/seamlesshr:$GITHUB_CONTEXT 
         docker push ${{ secrets.DOCKER_USERNAME}}/seamlesshr:$GITHUB_CONTEXT 
       # with:
       #   context: .
