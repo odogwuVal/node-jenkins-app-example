@@ -78,7 +78,7 @@ jobs:
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github.run_number) }}
-        run: echo "$GITHUB_CONTEXT-1"
+        run: echo "$(($GITHUB_CONTEXT-1))"
       - name: Test
         run: echo "I am just checking"
      
