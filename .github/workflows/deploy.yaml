@@ -79,9 +79,9 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github.run_number) }}
         run: |
-          echo "Current Number is $GITHUB_CONTEXT"
-          echo ::set-env name=NEWNUM::$(($GITHUB_CONTEXT+1))
-          echo "New Number is $NEWNUM"
-      - name: Test
-        run: echo "I am just checking"
+          run: |
+          echo "GITHUB_RUN_NUMBER_WITH_OFFSET=$(($GITHUB_CONTEXT + 200))" >> $GITHUB_ENV
+
+      - name: 'Perform Operation with ID ${{ env.GITHUB_RUN_NUMBER_WITH_OFFSET }}'
+        run: echo "Success!"
      
