@@ -41,7 +41,7 @@ jobs:
     - name: build and push image 
       uses: docker/build-push-action@v4
       env: 
-        GITHUB_CONTEXT: ${{ toJson(github.run_number) }}
+        GITHUB_CONTEXT: ${{ github.run_number }}
       with:
         context: .
         file: ./Dockerfile
@@ -60,13 +60,29 @@ jobs:
         PRIVATE_KEY: ${{ secrets.PRIVATE_KEY  }}
         HOSTNAME : ${{ secrets.HOSTNAME  }}
         USER_NAME : ${{ secrets.USER_NAME  }}
+        GITHUB_CONTEXT: ${{ github.run_number }}
           
       run: |
+        echo GITHUB_RUN_NUMBER_WITH_OFFSET=$(($GITHUB_CONTEXT-1)) >> $GITHUB_ENV
+        echo env.GITHUB_RUN_NUMBER_WITH_OFFSET
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
         ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
           cd /home/ubuntu &&
+          sed -E -i'' "s/(.*seamlesshr:).*/\1$GITHUB_CONTEXT/" 'docker-compose.yaml' &&
           docker-compose up -d
         ' 
+    - name: check rollout status
+      run: |
+        result=$( docker inspect -f {{.State.Running}} } seamlesshr)
+        echo $result
+        if [$result = "true"]
+        then
+          echo "rollout is successful"
+        else
+          sed -E -i'' "s/(.*seamlesshr:).*/\1env.GITHUB_RUN_NUMBER_WITH_OFFSET/" 'docker-compose.yaml'
+          docker-compose up -d
+          echo "rollback to previous version complete"
+        fi
 
   deploy_to_dev:
     runs-on: ubuntu-latest
