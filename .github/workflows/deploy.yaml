@@ -43,7 +43,7 @@ jobs:
       env: 
         GITHUB_CONTEXT: ${{ toJson(github.run_number) }}
       run: |
-        sudo docker build -t ${{ secrets.DOCKER_USERNAME}}/seamlesshr:`$GITHUB_CONTEXT`  .
+        sudo docker build -t ${{ secrets.DOCKER_USERNAME}}/seamlesshr:$GITHUB_CONTEXT -f ./Dockerfile  .
         docker push ${{ secrets.DOCKER_USERNAME}}/seamlesshr:`$GITHUB_CONTEXT`
       # with:
       #   context: .
