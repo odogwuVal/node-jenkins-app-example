@@ -68,22 +68,24 @@ jobs:
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
         ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
           cd /home/ubuntu &&
-          sed -E -i'' "s/(.*seamlesshr:).*/\1$GITHUB_CONTEXT/" 'docker-compose.yaml' &&
+          sed -i.back "/image:/s/${{ secrets.DOCKER_USERNAME }}\/seamlesshr:.*/${{ secrets.DOCKER_USERNAME }}\/seamlesshr:$GITHUB_CONTEXT/g" docker-compose.yaml &&
           docker-compose up -d
-        ' 
+        '
     - name: check rollout status
       run: |
-        result=$( docker inspect -f {{.State.Running}} } seamlesshr)
-        echo $result
-        if [$result = "true"]
-        then
-          echo "rollout is successful"
-        else
-          sed -E -i'' "s/(.*seamlesshr:).*/\1env.GITHUB_RUN_NUMBER_WITH_OFFSET/" 'docker-compose.yaml'
-          docker-compose up -d
-          echo "rollback to previous version complete"
-        fi
-
+        ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+          sleep 180
+          result=$( docker inspect -f {{.State.Running}} } seamlesshr)
+          echo $result
+          if [$result == "true"]
+          then
+            echo "rollout is successful"
+          else
+            sed -i.back "/image:/s/${{ secrets.DOCKER_USERNAME }}\/seamlesshr:.*/${{ secrets.DOCKER_USERNAME }}\/seamlesshr:env.GITHUB_RUN_NUMBER_WITH_OFFSET/g" docker-compose.yaml
+            docker-compose up -d
+            echo "rollback to previous version complete"
+          fi
+        '
   deploy_to_dev:
     runs-on: ubuntu-latest
     if: endsWith(github.ref, '/dev')
