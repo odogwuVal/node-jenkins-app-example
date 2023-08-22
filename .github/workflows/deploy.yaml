@@ -46,7 +46,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME}}/seamlesshr:$GITHUB_CONTEXT
+        tags: ${{ secrets.DOCKER_USERNAME}}/seamlesshr:"$GITHUB_CONTEXT"
 
   deploy_to_prod:
     runs-on: ubuntu-latest
