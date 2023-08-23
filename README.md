@@ -11,3 +11,21 @@ I have leveraged Github environments to dynamically require manual approval for 
 When a change is made to the dev branch, the entire process is automated but a change to the master branch will require a manual approval for deployment to occur
 
 ![approvals](review.png)
+
+I have also implemented a script that checks the status of the container to see if it is in a running state and rollback if it isn't
+
+```bash
+    ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+          sleep 180
+          result=$( docker inspect -f {{.State.Running}} } seamlesshr)
+          echo $result
+          if [$result == "true"]
+          then
+            echo "rollout is successful"
+          else
+            sed -i.back "/image:/s/${{ secrets.DOCKER_USERNAME }}\/seamlesshr:.*/${{ secrets.DOCKER_USERNAME }}\/seamlesshr:env.GITHUB_RUN_NUMBER_WITH_OFFSET/g" docker-compose.yaml
+            docker-compose up -d
+            echo "rollback to previous version complete"
+          fi
+        '
+```
